@@ -27,6 +27,8 @@
 #define A 0.66
 #define B 1.25
 
+#define LED_PIN (1 << PB0)
+
 // ==================== VARIÁVEIS GLOBAIS ====================
 #define NUM_MED 10
 uint16_t medidas[NUM_MED] = {0};
@@ -117,6 +119,9 @@ void init_buttons(void) {
     EICRA |= (1 << ISC01) | (1 << ISC11);
     EICRA &= ~((1 << ISC00) | (1 << ISC10));
     EIMSK |= (1 << INT0) | (1 << INT1);
+	
+	DDRB |= LED_PIN;
+	PORTD |= LED_PIN; 
 }
 
 // ==================== ADC ====================
@@ -255,6 +260,7 @@ void init(void) {
     init_buttons();
     init_timer1();
     adc_init();
+	DDRB |= LED_PIN;
 }
 
 // ==================== MAIN ====================
@@ -268,6 +274,7 @@ int main(void) {
 
     while (1) {
 		wdt_desable();
+		PORTB &= ~(LED_PIN);
 		lcd_clr();
 		lcd_print("Bafometro");
         while (start_test); // espera botão
@@ -302,6 +309,7 @@ int main(void) {
 
         while (!start_test) {
             if (att_display) {
+				PORTB |= LED_PIN;
                 lcd_show_selected(valor_mgl, valor_bac, valor_copos, unidade);
                 att_display = 0;
 				wdt_reset();
